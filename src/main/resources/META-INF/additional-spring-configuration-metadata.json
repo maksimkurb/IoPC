@@ -1,0 +1,23 @@
+{
+  "properties": [
+    {
+      "name": "mqtt.serverURI",
+      "type": "java.lang.String",
+      "description": "MQTT server URI."
+    },
+    {
+      "name": "mqtt.username",
+      "type": "java.lang.String",
+      "description": "MQTT client username."
+    },
+    {
+      "name": "mqtt.password",
+      "type": "java.lang.String",
+      "description": "MQTT client password."
+    },
+    {
+      "name": "mqtt.clientId",
+      "type": "java.lang.String",
+      "description": "MQTT client ID."
+    }
+  ] }

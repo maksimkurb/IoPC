@@ -1,28 +1,23 @@
 package ru.cubly.iopc.module.mqtt;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
-import org.springframework.integration.annotation.ServiceActivator;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.MessageHandler;
-import org.springframework.messaging.MessagingException;
+import org.springframework.integration.context.IntegrationContextUtils;
+import org.springframework.integration.dsl.IntegrationFlow;
+import org.springframework.integration.dsl.IntegrationFlows;
+import org.springframework.integration.dsl.Transformers;
+import org.springframework.integration.endpoint.MessageProducerSupport;
+import org.springframework.integration.handler.LoggingHandler;
 import org.springframework.stereotype.Service;
-import ru.cubly.iopc.action.ActionRequestedEvent;
+import ru.cubly.iopc.action.Intent;
 import ru.cubly.iopc.module.Module;
-import ru.cubly.iopc.module.presentation.PresentationControlAction;
-import util.PlatformType;
+import ru.cubly.iopc.util.PlatformType;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 @Service
 public class MqttModule implements Module {
-    private final ApplicationEventPublisher applicationEventPublisher;
-
-    public MqttModule(ApplicationEventPublisher applicationEventPublisher) {
-        this.applicationEventPublisher = applicationEventPublisher;
+    public MqttModule() {
     }
 
     @Override
@@ -35,25 +30,13 @@ public class MqttModule implements Module {
         return Arrays.asList(PlatformType.Windows, PlatformType.Linux, PlatformType.MacOS);
     }
 
-    @Override
-    public CompletableFuture<Void> start() {
-        return CompletableFuture.completedFuture(null);
-    }
-
-    @Override
-    public CompletableFuture<Void> stop() {
-        return CompletableFuture.completedFuture(null);
-    }
-
     @Bean
-    @ServiceActivator(inputChannel = "mqttInputChannel")
-    public MessageHandler handler() {
-        return message -> {
-            System.out.println(message.getPayload());
-            PresentationControlAction action = new PresentationControlAction();
-            action.setData("next");
-
-            applicationEventPublisher.publishEvent(new ActionRequestedEvent<>(action));
-        };
+    public IntegrationFlow mqttInbound(MessageProducerSupport mqttMessageDrivenChannelAdapter) {
+        mqttMessageDrivenChannelAdapter.setErrorChannelName(IntegrationContextUtils.ERROR_CHANNEL_BEAN_NAME);
+        return IntegrationFlows.from(mqttMessageDrivenChannelAdapter)
+                .log(LoggingHandler.Level.TRACE)
+                .transform(Transformers.fromJson(Intent.class))
+                .channel("intent")
+                .get();
     }
 }

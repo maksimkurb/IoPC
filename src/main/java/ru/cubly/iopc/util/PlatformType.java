@@ -1,4 +1,4 @@
-package util;
+package ru.cubly.iopc.util;
 
 public enum PlatformType {
     Windows("windows"),
