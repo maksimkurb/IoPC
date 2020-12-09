@@ -11,14 +11,18 @@ import ru.cubly.iopc.module.CallableModule;
 import ru.cubly.iopc.module.keyboard.KeyboardControlPayload;
 import ru.cubly.iopc.module.keyboard.KeyboardModule;
 import ru.cubly.iopc.transformer.ConditionalTransformer;
+import ru.cubly.iopc.util.FlowUtils;
 import ru.cubly.iopc.util.ModuleUtil;
 import ru.cubly.iopc.util.PlatformType;
 
 import java.awt.event.KeyEvent;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 @Service
 public class PresentationModule extends AbstractModule implements CallableModule {
+    public static final String ACTION_CONTROL = "control";
     private final KeyboardModule keyboardModule;
 
     protected PresentationModule(KeyboardModule keyboardModule) {
@@ -26,12 +30,21 @@ public class PresentationModule extends AbstractModule implements CallableModule
         this.keyboardModule = keyboardModule;
     }
 
+    @Override
+    public List<String> getAvailableActions() {
+        return Collections.singletonList(ACTION_CONTROL);
+    }
+
+    @Override
+    public Class<? extends IntentPayload> getPayloadType(String action) {
+        return PresentationControlPayload.class;
+    }
+
     @Bean
     public IntegrationFlow presentationIntegrationFlow() {
-        return IntegrationFlows.from(ModuleUtil.getInputChannelName(this))
-                .transform(ConditionalTransformer.ifString(Transformers.fromJson(PresentationControlPayload.class)))
+        return FlowUtils.forService(this, ACTION_CONTROL)
                 .transform(this::transformToKeyboard)
-                .channel(ModuleUtil.getInputChannelName(keyboardModule))
+                .channel(ModuleUtil.getInputChannelName(keyboardModule, KeyboardModule.ACTION_PRESS))
                 .get();
     }
 
@@ -62,8 +75,4 @@ public class PresentationModule extends AbstractModule implements CallableModule
         return keyboardControlPayload;
     }
 
-    @Override
-    public Class<? extends IntentPayload> getPayloadType() {
-        return PresentationControlPayload.class;
-    }
 }

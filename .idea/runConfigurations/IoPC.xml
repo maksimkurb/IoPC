@@ -1,0 +1,12 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="IoPC" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <module name="iopc-java.iopc-server.main" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="ru.cubly.iopc.IoPCApplication" />
+    <option name="ACTIVE_PROFILES" value="local" />
+    <option name="VM_PARAMETERS" value="-Djava.library.path=$PROJECT_DIR$/../iopc-java\iopc-native\build\libs\main\windows" />
+    <option name="ALTERNATIVE_JRE_PATH" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

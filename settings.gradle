@@ -11,5 +11,5 @@ pluginManagement {
     }
 }
 
-include 'iopc-jni-win32', 'iopc-server'
+include 'iopc-server', 'iopc-native'
 

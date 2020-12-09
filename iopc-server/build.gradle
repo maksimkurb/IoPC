@@ -13,7 +13,7 @@ group = 'ru.cubly.iopc'
 version = '0.0.1-SNAPSHOT'
 
 dependencies {
-    implementation project(':iopc-jni-win32')
+    implementation project(':iopc-native')
     implementation 'com.1stleg:jnativehook:2.1.0'
 
     compile 'org.springframework.boot:spring-boot-starter'
