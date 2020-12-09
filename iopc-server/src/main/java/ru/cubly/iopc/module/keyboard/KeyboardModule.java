@@ -11,16 +11,21 @@ import ru.cubly.iopc.AbstractModule;
 import ru.cubly.iopc.action.IntentPayload;
 import ru.cubly.iopc.module.CallableModule;
 import ru.cubly.iopc.transformer.ConditionalTransformer;
+import ru.cubly.iopc.util.FlowUtils;
 import ru.cubly.iopc.util.ModuleUtil;
 import ru.cubly.iopc.util.PlatformType;
 
 import java.awt.*;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 
 @Service
 @Slf4j
 public class KeyboardModule extends AbstractModule implements CallableModule {
+    public static final String ACTION_PRESS = "press";
+
     private final Robot robot;
 
     public KeyboardModule() {
@@ -36,10 +41,19 @@ public class KeyboardModule extends AbstractModule implements CallableModule {
         this.robot = robot;
     }
 
+    @Override
+    public List<String> getAvailableActions() {
+        return Collections.singletonList(ACTION_PRESS);
+    }
+
+    @Override
+    public Class<? extends IntentPayload> getPayloadType(String action) {
+        return KeyboardControlPayload.class;
+    }
+
     @Bean
     public IntegrationFlow keyboardIntegrationFlow() {
-        return IntegrationFlows.from(ModuleUtil.getInputChannelName(this))
-                .transform(ConditionalTransformer.ifString(Transformers.fromJson(KeyboardControlPayload.class)))
+        return FlowUtils.forService(this, ACTION_PRESS)
                 .handle(this::handle)
                 .get();
     }
@@ -52,10 +66,5 @@ public class KeyboardModule extends AbstractModule implements CallableModule {
 
         robot.keyPress(payload.getKeyCode());
         return null;
-    }
-
-    @Override
-    public Class<? extends IntentPayload> getPayloadType() {
-        return KeyboardControlPayload.class;
     }
 }

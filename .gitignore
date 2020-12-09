@@ -31,11 +31,11 @@ gradle-app.setting
 # gradle/wrapper/gradle-wrapper.properties
 
 ### IntelliJ IDEA ###
-.idea
 *.iws
 *.iml
 *.ipr
-!.idea/runConfigurations/*
+/.idea/*
+!/.idea/runConfigurations
 
 ### NetBeans ###
 /nbproject/private/

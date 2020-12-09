@@ -35,6 +35,7 @@ library {
 
         sharedLibrary {
             linkTask.configure {
+                linkerArgs.add('ole32.lib')
                 linkerArgs.add('user32.lib')
             }
         }

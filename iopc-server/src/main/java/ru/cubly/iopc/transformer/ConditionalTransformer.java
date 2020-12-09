@@ -24,4 +24,8 @@ public class ConditionalTransformer extends AbstractTransformer {
     public static Transformer ifString(Transformer transformer) {
         return new ConditionalTransformer(m -> m.getPayload() instanceof String, transformer);
     }
+
+    public static Transformer ifNotString(Transformer transformer) {
+        return new ConditionalTransformer(m -> !(m.getPayload() instanceof String), transformer);
+    }
 }

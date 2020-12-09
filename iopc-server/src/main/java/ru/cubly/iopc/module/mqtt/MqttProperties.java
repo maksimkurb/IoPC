@@ -1,7 +1,9 @@
 package ru.cubly.iopc.module.mqtt;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
+@Component
 @ConfigurationProperties(prefix = "mqtt")
 public class MqttProperties {
     private String serverURI;
