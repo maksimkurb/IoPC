@@ -2,15 +2,12 @@ package ru.cubly.iopc.module.presentation;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.IntegrationFlows;
-import org.springframework.integration.dsl.Transformers;
 import org.springframework.stereotype.Service;
 import ru.cubly.iopc.AbstractModule;
 import ru.cubly.iopc.action.IntentPayload;
 import ru.cubly.iopc.module.CallableModule;
 import ru.cubly.iopc.module.keyboard.KeyboardControlPayload;
 import ru.cubly.iopc.module.keyboard.KeyboardModule;
-import ru.cubly.iopc.transformer.ConditionalTransformer;
 import ru.cubly.iopc.util.FlowUtils;
 import ru.cubly.iopc.util.ModuleUtil;
 import ru.cubly.iopc.util.PlatformType;
@@ -51,20 +48,20 @@ public class PresentationModule extends AbstractModule implements CallableModule
     private KeyboardControlPayload transformToKeyboard(PresentationControlPayload payload) {
         KeyboardControlPayload keyboardControlPayload = new KeyboardControlPayload();
 
-        switch (payload.getData()) {
-            case "next": {
+        switch (payload.getAction()) {
+            case NEXT: {
                 keyboardControlPayload.setKeyCode(KeyEvent.VK_RIGHT);
                 break;
             }
-            case "previous": {
+            case PREVIOUS: {
                 keyboardControlPayload.setKeyCode(KeyEvent.VK_LEFT);
                 break;
             }
-            case "begin": {
+            case START: {
                 keyboardControlPayload.setKeyCode(KeyEvent.VK_F5);
                 break;
             }
-            case "end": {
+            case STOP: {
                 keyboardControlPayload.setKeyCode(KeyEvent.VK_ESCAPE);
                 break;
             }

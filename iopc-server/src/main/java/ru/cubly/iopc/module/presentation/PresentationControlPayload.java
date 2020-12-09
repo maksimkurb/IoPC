@@ -5,5 +5,5 @@ import ru.cubly.iopc.action.IntentPayload;
 
 @Data
 public class PresentationControlPayload implements IntentPayload {
-    private String data;
+    private PresentationAction action;
 }
