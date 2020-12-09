@@ -1,0 +1,89 @@
+plugins {
+    id 'java'
+    id 'dev.nokee.jni-library'
+    id 'dev.nokee.cpp-language'
+}
+
+import dev.nokee.platform.jni.JarBinary
+import dev.nokee.platform.jni.JniJarBinary
+import dev.nokee.platform.jni.JvmJarBinary
+import dev.nokee.platform.nativebase.TargetMachine
+
+library {
+    targetMachines = [machines.macOS, machines.linux, machines.windows]
+    variants.configureEach {
+        String osName
+        if (targetMachine.operatingSystemFamily.windows) {
+            osName = 'windows'
+        } else if (targetMachine.operatingSystemFamily.linux) {
+            osName = 'linux'
+        } else if (targetMachine.operatingSystemFamily.macOs) {
+            osName = 'osx'
+        } else {
+            throw new GradleException('Unknown operating system family')
+        }
+
+        String architectureName
+        if (targetMachine.architecture.is32Bit()) {
+            architectureName = '32'
+        } else if (targetMachine.architecture.is64Bit()) {
+            architectureName = '64'
+        } else {
+            throw new GradleException('Unknown architecture')
+        }
+        resourcePath = "/natives/${osName}_${architectureName}"
+
+        sharedLibrary {
+            linkTask.configure {
+                linkerArgs.add('user32.lib')
+            }
+        }
+    }
+}
+
+group = 'ru.cubly.iopc'
+version = '0.0.1-SNAPSHOT'
+
+dependencies {
+    compile 'org.scijava:native-lib-loader:2.3.4'
+    testImplementation 'junit:junit:4.12'
+}
+
+/**
+ * Returns a Groovy closure that convert a {@link JniJarBinary} or a {@link JvmJarBinary} to a {@link FileTree}
+ * representing the JAR content.
+ *
+ * @return a transformer of {@link JarBinary} instances to {@link FileTree} of their JAR content.
+ */
+def asZipTree() {
+    return { jarBinary ->
+        jarBinary.jarTask.map { zipTree(it.archiveFile) }
+    }
+}
+
+boolean isHostTargeted(TargetMachine targetMachine) {
+    String osName = System.getProperty('os.name').toLowerCase().replace(' ', '')
+    def osFamily = targetMachine.operatingSystemFamily
+    if (osFamily.windows && osName.contains('windows')) {
+        return true
+    } else if (osFamily.linux && osName.contains('linux')) {
+        return true
+    } else if (osFamily.macOs && osName.contains('macos')) {
+        return true
+    }
+    return false
+}
+
+tasks.register("uberJar", Jar) {
+    from(library.variants.flatMap { variant ->
+        def result = []
+        if (isHostTargeted(variant.targetMachine)) {
+            result << variant.binaries.withType(JniJarBinary).map(asZipTree())
+        }
+        return result
+    }) {
+        exclude 'META-INF/**'
+    }
+    from(library.binaries.withType(JvmJarBinary).map(asZipTree()))
+    archiveClassifier = "uber"
+}
