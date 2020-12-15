@@ -56,17 +56,17 @@ public class VolumeModule extends AbstractModule implements CallableModule {
                 .get();
     }
 
+    private Object setVolume(SetVolumePayload payload, MessageHeaders headers) {
+        VolumeControl.setMasterVolume(Math.min(Math.max(payload.getVolume(), 0), 100));
+        return new DummyIntentPayload();
+    }
+
     @Bean
     public IntegrationFlow getVolumeIntegrationFlow() {
         return FlowUtils.forService(this, ACTION_GET)
                 .handle(this::getVolume)
                 .channel(ModuleUtil.getInputChannelName(mqttModule, MqttModule.ACTION_SEND))
                 .get();
-    }
-
-    private Object setVolume(SetVolumePayload payload, MessageHeaders headers) {
-        VolumeControl.setMasterVolume(Math.min(Math.max(payload.getVolume(), 0), 100));
-        return new DummyIntentPayload();
     }
 
     private MqttPayload getVolume(IntentPayload payload, MessageHeaders headers) {
