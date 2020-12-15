@@ -36,7 +36,7 @@ public class MqttModule extends AbstractModule implements CallableModule {
     public static final String ACTION_SEND = "send";
     private final List<CallableModule> modules;
 
-    protected MqttModule(List<CallableModule> modules, MqttProperties mqttProperties) {
+    protected MqttModule(List<CallableModule> modules) {
         super("mqtt", Arrays.asList(PlatformType.Windows, PlatformType.Linux, PlatformType.MacOS));
 
         this.modules = modules;
@@ -51,17 +51,6 @@ public class MqttModule extends AbstractModule implements CallableModule {
     @Override
     public Class<? extends IntentPayload> getPayloadType(String action) {
         return MqttPayload.class;
-    }
-
-    @Bean
-    public IntegrationFlow mqttIntegrationFlow(MessageHandler mqttOutboundMessageHandler) {
-        return FlowUtils.forService(this, ACTION_SEND)
-                .enrichHeaders(h -> h.headerExpression(MqttHeaders.TOPIC,
-                        "T(ru.cubly.iopc.module.mqtt.MqttUtil).outboundTopic(@mqttProperties.prefix, @mqttProperties.clientId, payload.topic)"))
-                .transform(MqttPayload::getBody)
-                .transform(ConditionalTransformer.ifNotString(Transformers.toJson()))
-                .handle(mqttOutboundMessageHandler)
-                .get();
     }
 
     @Bean
@@ -85,6 +74,17 @@ public class MqttModule extends AbstractModule implements CallableModule {
                 .enrichHeaders(h -> h.headerExpression(HEADER_SERVICE_NAME, "payload.service"))
                 .transform(Intent::getPayload)
                 .route(router)
+                .get();
+    }
+
+    @Bean
+    public IntegrationFlow mqttOutbound(MessageHandler mqttOutboundMessageHandler) {
+        return FlowUtils.forService(this, ACTION_SEND)
+                .enrichHeaders(h -> h.headerExpression(MqttHeaders.TOPIC,
+                        "T(ru.cubly.iopc.module.mqtt.MqttUtil).outboundTopic(@mqttProperties.prefix, @mqttProperties.clientId, payload.topic)"))
+                .transform(MqttPayload::getBody)
+                .transform(ConditionalTransformer.ifNotString(Transformers.toJson()))
+                .handle(mqttOutboundMessageHandler)
                 .get();
     }
 }
