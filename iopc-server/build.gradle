@@ -12,13 +12,22 @@ apply plugin: 'io.spring.dependency-management'
 group = 'ru.cubly.iopc'
 version = '0.0.1-SNAPSHOT'
 
+processResources {
+    filesMatching('application.properties') {
+        expand(project.properties)
+    }
+}
+
 dependencies {
     implementation project(':iopc-native')
     implementation 'com.1stleg:jnativehook:2.1.0'
 
-    compile 'org.springframework.boot:spring-boot-starter'
-    compile 'org.springframework.boot:spring-boot-starter-logging'
-    implementation 'org.springframework.integration:spring-integration-mqtt:5.4.1'
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-logging'
+    implementation "org.springframework.integration:spring-integration-mqtt:5.4.3"
+    implementation "org.springframework.integration:spring-integration-websocket:5.4.3"
+    implementation 'org.jmdns:jmdns:3.5.1'
 
     compile 'org.slf4j:slf4j-api'
 

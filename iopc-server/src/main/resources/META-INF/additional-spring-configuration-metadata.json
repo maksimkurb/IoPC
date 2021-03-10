@@ -19,5 +19,10 @@
       "name": "mqtt.clientId",
       "type": "java.lang.String",
       "description": "MQTT client ID."
+    },
+    {
+      "name": "app.build-info.version",
+      "type": "java.lang.String",
+      "description": "App version"
     }
   ] }
