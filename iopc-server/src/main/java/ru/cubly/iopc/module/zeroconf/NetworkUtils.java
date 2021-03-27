@@ -16,7 +16,7 @@ import java.util.Enumeration;
 @Slf4j
 public class NetworkUtils {
 
-    private static final byte[] ROUTABLE_HOST_ADDRESS_IPv4 = { 1, 1, 1, 1 };
+    private static final byte[] ROUTABLE_HOST_ADDRESS_IPv4 = {1, 1, 1, 1};
 
     public InetAddress getAddress(final String... addresses) throws IOException {
         for (final String address : addresses) {

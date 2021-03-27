@@ -17,6 +17,10 @@ processResources {
         expand(project.properties)
     }
 }
+ext {
+    set('springCloudVersion', "2020.0.0")
+}
+
 
 dependencies {
     implementation project(':iopc-native')
@@ -25,9 +29,13 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-logging'
-    implementation "org.springframework.integration:spring-integration-mqtt:5.4.3"
-    implementation "org.springframework.integration:spring-integration-websocket:5.4.3"
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.integration:spring-integration-mqtt:5.4.4'
+    implementation 'org.springframework.integration:spring-integration-websocket:5.4.4'
+    implementation 'org.springframework.cloud:spring-cloud-starter-config'
     implementation 'org.jmdns:jmdns:3.5.1'
+    implementation 'org.reflections:reflections:0.9.12'
 
     compile 'org.slf4j:slf4j-api'
 
@@ -40,6 +48,11 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'

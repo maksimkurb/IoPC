@@ -1,6 +1,5 @@
 package ru.cubly.iopc;
 
-import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
@@ -14,7 +13,6 @@ public class IoPCApplication {
 
     public static void main(String[] args) {
         new SpringApplicationBuilder(IoPCApplication.class)
-                .web(WebApplicationType.NONE)
                 .run(args);
     }
 

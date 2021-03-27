@@ -1,0 +1,158 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Getting Started: Serving Web Content</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+    <link rel="stylesheet" type="text/css" href="/css/semantic.min.css">
+
+    <!-- You MUST include jQuery before Fomantic -->
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/semantic.min.js"></script>
+    <style>
+        .header-checkbox {
+            float: right;
+        }
+
+        #modules-accordion .title .name {
+            flex: 1;
+        }
+
+        #modules-accordion .title .check {
+            flex: 0;
+            width: 3.5rem;
+        }
+
+        #modules-accordion .title .check label {
+            padding-left: 3.5rem;
+        }
+
+        .main.container {
+            padding: 1em 0;
+        }
+
+        #main-menu {
+            margin-bottom: 2em;
+        }
+    </style>
+</head>
+<body>
+
+<div class="ui main container">
+
+    <div class="ui stackable menu" id="main-menu">
+        <a class="item" href="/">
+            <i class="gamepad icon"></i>
+            IoPC
+        </a>
+    </div>
+
+    <div class="ui visible info message" th:if="${reloadRequired}">
+        <div class="header">New configuration will be applied after server restart</div>
+        <p>Please restart the server</p>
+    </div>
+
+    <div class="ui stackable very relaxed grid">
+        <div class="six wide column">
+            <form class="ui form" action="#" th:action="@{/config/app}" th:object="${appConfig}" method="post">
+                <div class="field">
+                    <label for="port">Port</label>
+                    <input type="number" id="port" th:field="*{port}" placeholder="Port">
+                </div>
+                <button class="ui labeled icon primary button" type="submit">
+                    <i class="save icon"></i>
+                    Save config
+                </button>
+            </form>
+        </div>
+        <div class="ten wide column">
+            <div class="ui styled fluid accordion" id="modules-accordion">
+                <th:block th:each="m : ${moduleDescriptions}">
+                    <div class="ui very compact grid title">
+                        <div class="ui column name">
+                            <th:block th:text="${m.moduleName}">ModuleName</th:block>
+                            <i th:if="${m.configurable}" class="wrench icon"></i>
+                        </div>
+
+                        <div class="ui column check">
+                            <div class="ui toggle checkbox header-checkbox" data-content="Toggle module"
+                                 data-inverted="" data-position="top right">
+                                <input type="checkbox" tabindex="0" class="hidden" th:checked="${m.enabled}">
+                            </div>
+                        </div>
+                    </div>
+                    <div th:if="${!m.configurable}" class="content">
+                        <div class="ui visible message">
+                            <p>This module has no settings</p>
+                        </div>
+                    </div>
+                    <div th:if="${m.configurable}" class="content">
+                        <form class="ui form"
+                              action="#"
+                              th:action="@{/config/{id}(id=${m.moduleId})}"
+                              th:object="${m.moduleConfig}"
+                              method="post">
+                            <th:block
+                                th:replace="~{${'config-fragments/' + m.configFragment} :: form}"
+                            />
+                            <button class="ui labeled icon primary fluid button" type="submit">
+                                <i class="save icon"></i>
+                                Save module config
+                            </button>
+                        </form>
+                    </div>
+                </th:block>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $('#modules-accordion').accordion({
+        selector: {
+            trigger: '.title > .name'
+        }
+    });
+    $('.ui.checkbox').checkbox();
+    $('.header-checkbox').popup({
+        delay: {
+            show: 700,
+            hide: 70
+        }
+    })
+    $('.message .close')
+        .on('click', function () {
+            $(this)
+                .closest('.message')
+                .transition('fade')
+            ;
+        });
+</script>
+
+<script th:if="${configSaved == 'app'}">
+    $('body')
+        .toast({
+            class: 'success',
+            message: 'App settings saved'
+        });
+</script>
+<script th:if="${configSaved == 'module'}">
+    $('body')
+        .toast({
+            class: 'success',
+            message: 'Module settings saved'
+        });
+</script>
+<script th:if="${configSaveError}">
+    $('body')
+        .toast({
+            displayTime: 5000,
+            class: 'error',
+            title: 'Could not save settings',
+            message: `Please check logs for information.`
+        });
+</script>
+
+
+</body>
+</html>

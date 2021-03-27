@@ -12,8 +12,6 @@ import ru.cubly.iopc.util.PlatformType;
 import javax.annotation.PreDestroy;
 import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceInfo;
-import javax.jmdns.impl.DNSRecord;
-import javax.jmdns.impl.ServiceInfoImpl;
 import java.io.IOException;
 import java.net.Inet6Address;
 import java.net.InetAddress;

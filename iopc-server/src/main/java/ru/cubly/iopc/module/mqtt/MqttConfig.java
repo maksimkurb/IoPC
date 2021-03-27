@@ -32,8 +32,8 @@ public class MqttConfig {
     public MqttPahoClientFactory mqttClientFactory() {
         DefaultMqttPahoClientFactory factory = new DefaultMqttPahoClientFactory();
         MqttConnectOptions options = new MqttConnectOptions();
-        options.setServerURIs(new String[]{mqttProperties.getServerURI()});
-        options.setUserName(mqttProperties.getUserName());
+        options.setServerURIs(new String[]{mqttProperties.getServerUri()});
+        options.setUserName(mqttProperties.getUsername());
         options.setPassword(mqttProperties.getPassword().toCharArray());
         factory.setConnectionOptions(options);
         return factory;
@@ -41,11 +41,11 @@ public class MqttConfig {
 
     @Bean
     public MessageProducerSupport mqttMessageDrivenChannelAdapter(MqttPahoClientFactory clientFactory) {
-        String topic = mqttProperties.getPrefix()+"/"+ mqttProperties.getClientId()+"/command/#";
+        String topic = mqttProperties.getPrefix() + "/" + mqttProperties.getClientId() + "/command/#";
         log.info("MQTT is listening on {}", topic);
 
         MqttPahoMessageDrivenChannelAdapter adapter =
-                new MqttPahoMessageDrivenChannelAdapter(mqttProperties.getClientId()+"-in", clientFactory, topic);
+                new MqttPahoMessageDrivenChannelAdapter(mqttProperties.getClientId() + "-in", clientFactory, topic);
         adapter.setCompletionTimeout(5000);
         adapter.setConverter(new DefaultPahoMessageConverter());
         adapter.setQos(1);
@@ -56,7 +56,7 @@ public class MqttConfig {
     @Bean
     public MessageHandler mqttOutboundMessageHandler(MqttPahoClientFactory clientFactory) {
         String topic = MqttUtil.outboundTopic(mqttProperties.getPrefix(), mqttProperties.getClientId(), "default_topic");
-        MqttPahoMessageHandler messageHandler = new MqttPahoMessageHandler(mqttProperties.getClientId()+"-out", clientFactory);
+        MqttPahoMessageHandler messageHandler = new MqttPahoMessageHandler(mqttProperties.getClientId() + "-out", clientFactory);
         messageHandler.setAsync(true);
         messageHandler.setDefaultTopic(topic);
         return messageHandler;

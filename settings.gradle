@@ -11,5 +11,6 @@ pluginManagement {
     }
 }
 
-include 'iopc-server', 'iopc-native'
+include 'iopc-native'
+include 'iopc-server'
 
