@@ -5,9 +5,10 @@ public enum PlatformType {
     MacOS("macos"),
     Linux("linux");
 
-    PlatformType(String platform){
-        this.platform=platform;
+    PlatformType(String platform) {
+        this.platform = platform;
     }
+
     protected String platform;
 
     public String getPlatform() {

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head></head>
+<body>
+<th:block th:fragment="form">
+    <div class="field">
+        <label for="serverUri">Server URI</label>
+        <input type="text" id="serverUri" name="serverUri" th:value="*{serverUri}" placeholder="tcp://127.0.0.1:1883">
+    </div>
+    <div class="field">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" th:value="*{username}">
+    </div>
+    <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" th:value="*{password}">
+    </div>
+    <div class="field">
+        <label for="clientId">Client ID</label>
+        <input type="text" id="clientId" name="clientId" th:value="*{clientId}">
+    </div>
+    <div class="field">
+        <label for="prefix">MQTT Prefix</label>
+        <input type="text" id="prefix" name="prefix" th:value="*{prefix}">
+    </div>
+</th:block>
+</body>
+</html>

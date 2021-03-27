@@ -1,12 +1,6 @@
 package ru.cubly.iopc;
 
-import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.IntegrationFlows;
-import org.springframework.integration.dsl.Transformers;
 import ru.cubly.iopc.module.Module;
-import ru.cubly.iopc.module.presentation.PresentationControlPayload;
-import ru.cubly.iopc.transformer.ConditionalTransformer;
-import ru.cubly.iopc.util.ModuleUtil;
 import ru.cubly.iopc.util.PlatformType;
 
 import java.util.List;

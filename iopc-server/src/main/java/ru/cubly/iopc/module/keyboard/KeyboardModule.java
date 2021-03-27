@@ -3,16 +3,12 @@ package ru.cubly.iopc.module.keyboard;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.IntegrationFlows;
-import org.springframework.integration.dsl.Transformers;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.stereotype.Service;
 import ru.cubly.iopc.AbstractModule;
 import ru.cubly.iopc.action.IntentPayload;
 import ru.cubly.iopc.module.CallableModule;
-import ru.cubly.iopc.transformer.ConditionalTransformer;
 import ru.cubly.iopc.util.FlowUtils;
-import ru.cubly.iopc.util.ModuleUtil;
 import ru.cubly.iopc.util.PlatformType;
 
 import java.awt.*;

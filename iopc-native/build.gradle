@@ -9,6 +9,9 @@ import dev.nokee.platform.jni.JniJarBinary
 import dev.nokee.platform.jni.JvmJarBinary
 import dev.nokee.platform.nativebase.TargetMachine
 
+group = 'ru.cubly.iopc'
+version = '0.0.1-SNAPSHOT'
+
 library {
     targetMachines = [machines.macOS, machines.linux, machines.windows]
     variants.configureEach {
@@ -41,9 +44,6 @@ library {
         }
     }
 }
-
-group = 'ru.cubly.iopc'
-version = '0.0.1-SNAPSHOT'
 
 dependencies {
     compile 'org.scijava:native-lib-loader:2.3.4'
