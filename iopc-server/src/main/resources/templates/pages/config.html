@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <title>Getting Started: Serving Web Content</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -48,20 +48,32 @@
     </div>
 
     <div class="ui visible info message" th:if="${reloadRequired}">
-        <div class="header">New configuration will be applied after server restart</div>
-        <p>Please restart the server</p>
+        <div class="header" th:text="#{reload-required.header}"></div>
+        <p th:text="#{reload-required.body}"></p>
     </div>
 
     <div class="ui stackable very relaxed grid">
         <div class="six wide column">
             <form class="ui form" action="#" th:action="@{/config/app}" th:object="${appConfig}" method="post">
                 <div class="field">
-                    <label for="port">Port</label>
-                    <input type="number" id="port" th:field="*{port}" placeholder="Port">
+                    <label for="port" th:text="#{config.field.port}"></label>
+                    <input type="number" id="port" th:field="*{port}" th:placeholder="#{config.field.port}">
+                </div>
+                <div class="field">
+                    <label th:placeholder="#{config.field.language}"></label>
+                    <div class="ui fluid search selection dropdown">
+                        <input type="hidden" th:field="*{language}">
+                        <i class="dropdown icon"></i>
+                        <div class="default text" th:text="#{config.field.language}"></div>
+                        <div class="menu">
+                            <div class="item" data-value="en"><i class="us flag"></i><th:block th:text="#{lang.en}"></th:block></div>
+                            <div class="item" data-value="ru"><i class="ru flag"></i><th:block th:text="#{lang.ru}"></th:block></div>
+                        </div>
+                    </div>
                 </div>
                 <button class="ui labeled icon primary button" type="submit">
                     <i class="save icon"></i>
-                    Save config
+                    <th:block th:text="#{config.save}"></th:block>
                 </button>
             </form>
         </div>
@@ -74,16 +86,18 @@
                             <i th:if="${m.configurable}" class="wrench icon"></i>
                         </div>
 
+                        <!--/*
                         <div class="ui column check">
                             <div class="ui toggle checkbox header-checkbox" data-content="Toggle module"
                                  data-inverted="" data-position="top right">
                                 <input type="checkbox" tabindex="0" class="hidden" th:checked="${m.enabled}">
                             </div>
                         </div>
+                        */-->
                     </div>
                     <div th:if="${!m.configurable}" class="content">
                         <div class="ui visible message">
-                            <p>This module has no settings</p>
+                            <p th:text="#{config.module.no-config}"></p>
                         </div>
                     </div>
                     <div th:if="${m.configurable}" class="content">
@@ -97,7 +111,7 @@
                             />
                             <button class="ui labeled icon primary fluid button" type="submit">
                                 <i class="save icon"></i>
-                                Save module config
+                                <th:block th:text="#{config.module.save}"></th:block>
                             </button>
                         </form>
                     </div>
@@ -114,6 +128,7 @@
         }
     });
     $('.ui.checkbox').checkbox();
+    $('.selection.dropdown').dropdown();
     $('.header-checkbox').popup({
         delay: {
             show: 700,
@@ -133,14 +148,14 @@
     $('body')
         .toast({
             class: 'success',
-            message: 'App settings saved'
+            message: '[[#{config.saved}]]'
         });
 </script>
 <script th:if="${configSaved == 'module'}">
     $('body')
         .toast({
             class: 'success',
-            message: 'Module settings saved'
+            message: '[[#{config.module.saved}]]'
         });
 </script>
 <script th:if="${configSaveError}">

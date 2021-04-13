@@ -3,7 +3,6 @@ package ru.cubly.iopc.configurator.service;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.stereotype.Service;
 import ru.cubly.iopc.configurator.model.AppConfig;
 import ru.cubly.iopc.configurator.model.ModuleDescription;
@@ -15,7 +14,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +26,8 @@ import java.util.stream.Collectors;
 public class ConfigService {
 
     private final String iopcPropertiesFile;
-    private final ServerProperties serverProperties;
+    private final Integer port;
+    private final String language;
     private final List<Module> modules;
 
     private AppConfig appConfig = null;
@@ -39,18 +38,21 @@ public class ConfigService {
 
     public ConfigService(
             @Value("${spring.config.import}") String iopcPropertiesFile,
-            ServerProperties serverProperties,
+            @Value("${server.port}") Integer port,
+            @Value("${server.language}") String language,
             List<Module> modules) {
-        this.serverProperties = serverProperties;
         this.modules = modules;
         this.iopcPropertiesFile = iopcPropertiesFile;
 
+        this.port = port;
+        this.language = language;
     }
 
     public AppConfig getAppConfig() {
         if (appConfig == null) {
             appConfig = new AppConfig();
-            appConfig.setPort(serverProperties.getPort());
+            appConfig.setPort(port);
+            appConfig.setLanguage(language);
         }
 
         return appConfig;
@@ -61,7 +63,11 @@ public class ConfigService {
 
         this.appConfig = config;
 
-        applyProperties(Collections.singletonMap("server.port", appConfig.getPort().toString()));
+        Map<String, String> propertiesMap = new HashMap<>();
+        propertiesMap.put("server.port", appConfig.getPort().toString());
+        propertiesMap.put("server.language", appConfig.getLanguage());
+
+        applyProperties(propertiesMap);
     }
 
     public Object getEmptyModuleConfig(String moduleName) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
@@ -83,6 +89,14 @@ public class ConfigService {
         applyProperties(map);
 
         updatedModuleConfig.put(moduleName, moduleConfig);
+    }
+
+    public List<ModuleDescription> getModuleDescriptions() {
+        return modules
+                .stream()
+                .map(this::buildModuleDescription)
+                .sorted(Comparator.comparing(ModuleDescription::getModuleName))
+                .collect(Collectors.toUnmodifiableList());
     }
 
     private void applyProperties(Map<String, String> properties) throws IOException {
@@ -120,14 +134,6 @@ public class ConfigService {
         return (ConfigurableModule<T>) module;
     }
 
-    public List<ModuleDescription> getModuleDescriptions() {
-        return modules
-                .stream()
-                .map(this::buildModuleDescription)
-                .sorted(Comparator.comparing(ModuleDescription::getModuleName))
-                .collect(Collectors.toUnmodifiableList());
-    }
-
     private ModuleDescription buildModuleDescription(Module module) {
         ModuleDescription.ModuleDescriptionBuilder builder = ModuleDescription.builder();
 
@@ -147,7 +153,7 @@ public class ConfigService {
                     .getOrDefault(module.getModuleId(), configurableModule.getConfigFragmentModel());
             builder
                     .configurable(true)
-                    .configFragment(configurableModule.getConfigFragmentName())
+                    .configFragment(module.getModuleId())
                     .moduleConfig(moduleConfig);
         }
 
