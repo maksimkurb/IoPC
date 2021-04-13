@@ -24,5 +24,10 @@
       "name": "app.build-info.version",
       "type": "java.lang.String",
       "description": "App version"
+    },
+    {
+      "name": "server.language",
+      "type": "java.lang.String",
+      "description": "Server locale in IETF BCP 47 language tag format."
     }
   ] }

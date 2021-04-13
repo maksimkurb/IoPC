@@ -95,11 +95,6 @@ public class MqttModule extends AbstractModule implements CallableModule, Config
     }
 
     @Override
-    public String getConfigFragmentName() {
-        return "mqtt";
-    }
-
-    @Override
     public MqttProperties getConfigFragmentModel() {
         return mqttProperties;
     }

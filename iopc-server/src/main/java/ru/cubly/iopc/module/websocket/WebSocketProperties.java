@@ -8,5 +8,7 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "websocket")
 @Data
 public class WebSocketProperties {
-
+    private Boolean secured = false;
+    private String username;
+    private String password;
 }

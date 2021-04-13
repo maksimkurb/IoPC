@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head></head>
+<body>
+<th:block th:fragment="form">
+    <div class="field">
+        <div class="ui checkbox">
+            <input type="checkbox" tabindex="0" class="hidden" th:checked="*{secured}">
+            <label th:text="#{config.module.websocket.secured}"></label>
+        </div>
+    </div>
+    <div class="field">
+        <label for="username" th:text="#{config.module.websocket.username}"></label>
+        <input type="text" id="username" name="username" th:value="*{username}">
+    </div>
+    <div class="field">
+        <label for="password"  th:text="#{config.module.websocket.password}"></label>
+        <input type="password" id="password" name="password" th:value="*{password}">
+    </div>
+</th:block>
+</body>
+</html>
