@@ -1,27 +1,21 @@
 package ru.cubly.iopc.module.mqtt;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Bean;
-import org.springframework.integration.context.IntegrationContextUtils;
+import org.springframework.integration.annotation.MessagingGateway;
 import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.dsl.Transformers;
 import org.springframework.integration.endpoint.MessageProducerSupport;
-import org.springframework.integration.handler.LoggingHandler;
 import org.springframework.integration.mqtt.support.MqttHeaders;
-import org.springframework.integration.router.HeaderValueRouter;
 import org.springframework.messaging.MessageHandler;
 import org.springframework.stereotype.Service;
 import ru.cubly.iopc.AbstractModule;
-import ru.cubly.iopc.action.Intent;
 import ru.cubly.iopc.action.IntentPayload;
 import ru.cubly.iopc.module.CallableModule;
 import ru.cubly.iopc.module.ConfigurableModule;
 import ru.cubly.iopc.transformer.ConditionalTransformer;
 import ru.cubly.iopc.util.FlowUtils;
-import ru.cubly.iopc.util.ModuleUtil;
 import ru.cubly.iopc.util.PlatformType;
 
 import java.util.Arrays;
@@ -30,23 +24,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static ru.cubly.iopc.util.Constants.HEADER_SERVICE_NAME;
-
 @RefreshScope
 @Service
 @Slf4j
 public class MqttModule extends AbstractModule implements CallableModule, ConfigurableModule<MqttProperties> {
-    @Autowired
-    private MqttProperties mqttProperties;
-
     public static final String ACTION_SEND = "send";
     private final List<CallableModule> modules;
+    private final MqttProperties mqttProperties;
 
-    protected MqttModule(List<CallableModule> modules) {
+    protected MqttModule(List<CallableModule> modules, MqttProperties mqttProperties) {
         super("mqtt", Arrays.asList(PlatformType.Windows, PlatformType.Linux, PlatformType.MacOS));
 
         this.modules = modules;
-        this.modules.remove(this);
+        this.mqttProperties = mqttProperties;
     }
 
     @Override
@@ -61,26 +51,16 @@ public class MqttModule extends AbstractModule implements CallableModule, Config
 
     @Bean
     public IntegrationFlow mqttInbound(MessageProducerSupport mqttMessageDrivenChannelAdapter) {
-        mqttMessageDrivenChannelAdapter.setErrorChannelName(IntegrationContextUtils.ERROR_CHANNEL_BEAN_NAME);
-        HeaderValueRouter router = new HeaderValueRouter(HEADER_SERVICE_NAME);
+        return FlowUtils.moduleRouterFlow(
+                mqttMessageDrivenChannelAdapter,
+                modules,
+                this.getModuleId()
+        );
+    }
 
-        for (CallableModule m : modules) {
-            if (m.getModuleId().equals(this.getModuleId()))
-                continue;
-
-            for (String action : m.getAvailableActions()) {
-                String service = ModuleUtil.getService(m, action);
-                router.setChannelMapping(service, ModuleUtil.getInputChannelName(m, action));
-            }
-        }
-
-        return IntegrationFlows.from(mqttMessageDrivenChannelAdapter)
-                .log(LoggingHandler.Level.TRACE)
-                .transform(Transformers.fromJson(Intent.class))
-                .enrichHeaders(h -> h.headerExpression(HEADER_SERVICE_NAME, "payload.service"))
-                .transform(Intent::getPayload)
-                .route(router)
-                .get();
+    @MessagingGateway(defaultRequestChannel = "#{T(ru.cubly.iopc.util.ModuleUtil).getInputChannelName(\"mqtt\", \"send\")}")
+    public interface MqttMessagingTemplate {
+        void send(MqttPayload payload);
     }
 
     @Bean

@@ -37,6 +37,9 @@ dependencies {
     implementation 'org.jmdns:jmdns:3.5.1'
     implementation 'org.reflections:reflections:0.9.12'
 
+    implementation 'com.github.oshi:oshi-core:5.7.2' // TODO: use for SysInfo module
+    implementation 'net.java.dev.jna:jna:5.8.0'
+
     compile 'org.slf4j:slf4j-api'
 
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.11.0'
