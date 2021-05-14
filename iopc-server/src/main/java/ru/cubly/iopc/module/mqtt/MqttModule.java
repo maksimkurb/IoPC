@@ -9,6 +9,7 @@ import org.springframework.integration.dsl.Transformers;
 import org.springframework.integration.endpoint.MessageProducerSupport;
 import org.springframework.integration.mqtt.support.MqttHeaders;
 import org.springframework.messaging.MessageHandler;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import ru.cubly.iopc.AbstractModule;
 import ru.cubly.iopc.action.IntentPayload;
@@ -58,6 +59,7 @@ public class MqttModule extends AbstractModule implements CallableModule, Config
         );
     }
 
+    @Component
     @MessagingGateway(defaultRequestChannel = "#{T(ru.cubly.iopc.util.ModuleUtil).getInputChannelName(\"mqtt\", \"send\")}")
     public interface MqttMessagingTemplate {
         void send(MqttPayload payload);

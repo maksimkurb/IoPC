@@ -12,9 +12,17 @@ import com.sun.jna.win32.StdCallLibrary;
  * @see <a href="https://ochafik.com/p_98">Original post</a>
  */
 public class Win32IdleTime {
-    public interface Kernel32 extends StdCallLibrary {
-        Kernel32 INSTANCE = Native.load("kernel32", Kernel32.class);
+    private static Kernel32 kernel32 = null;
+    private static User32 user32 = null;
 
+    public static void init() {
+        if (kernel32 == null)
+            kernel32 = Native.load("kernel32", Kernel32.class);
+        if (user32 == null)
+            user32 = Native.load("user32", User32.class);
+    }
+
+    public interface Kernel32 extends StdCallLibrary {
         /**
          * Retrieves the number of milliseconds that have elapsed since the system was started.
          *
@@ -25,8 +33,6 @@ public class Win32IdleTime {
     }
 
     public interface User32 extends StdCallLibrary {
-        User32 INSTANCE = Native.load("user32", User32.class);
-
         /**
          * Contains the time of the last input.
          *
@@ -55,9 +61,13 @@ public class Win32IdleTime {
      * @return idle time in milliseconds
      */
     public static int getIdleTimeMillisWin32() {
+        if (user32 == null || kernel32 == null) {
+            throw new NullPointerException("You must call Win32IdleTime.init() before calling other static methods in this class");
+        }
+
         User32.LASTINPUTINFO lastInputInfo = new User32.LASTINPUTINFO();
-        User32.INSTANCE.GetLastInputInfo(lastInputInfo);
-        return Kernel32.INSTANCE.GetTickCount() - lastInputInfo.dwTime;
+        user32.GetLastInputInfo(lastInputInfo);
+        return kernel32.GetTickCount() - lastInputInfo.dwTime;
     }
 }
 
