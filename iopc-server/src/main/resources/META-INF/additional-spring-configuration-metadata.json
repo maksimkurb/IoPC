@@ -29,5 +29,15 @@
       "name": "server.language",
       "type": "java.lang.String",
       "description": "Server locale in IETF BCP 47 language tag format."
+    },
+    {
+      "name": "sysinfo.report-cron",
+      "type": "java.lang.String",
+      "description": "Report cron for sysinfo module."
+    },
+    {
+      "name": "activity.report-cron",
+      "type": "java.lang.String",
+      "description": "Report cron for activity module."
     }
   ] }

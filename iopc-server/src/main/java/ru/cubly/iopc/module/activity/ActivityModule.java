@@ -1,55 +1,73 @@
 package ru.cubly.iopc.module.activity;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.apache.tomcat.jni.Local;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
+import org.springframework.integration.core.MessageSource;
+import org.springframework.integration.dsl.IntegrationFlow;
+import org.springframework.integration.dsl.IntegrationFlows;
+import org.springframework.integration.dsl.Pollers;
+import org.springframework.integration.dsl.Transformers;
+import org.springframework.integration.support.json.JsonObjectMapper;
 import org.springframework.stereotype.Service;
 import ru.cubly.iopc.AbstractModule;
 import ru.cubly.iopc.module.mqtt.MqttModule;
 import ru.cubly.iopc.module.mqtt.MqttPayload;
 import ru.cubly.iopc.util.ModuleUtil;
 import ru.cubly.iopc.util.PlatformType;
+import ru.cubly.iopc.util.conditions.ConditionalOnPlatform;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
-
-import static ru.cubly.iopc.module.activity.Win32IdleTime.getIdleTimeMillisWin32;
-import static ru.cubly.iopc.module.mqtt.MqttModule.ACTION_SEND;
 
 @Service
 @Slf4j
 public class ActivityModule extends AbstractModule {
     private final MqttModule mqttModule;
-    private final MqttModule.MqttMessagingTemplate mqttMessagingTemplate;
-    private ActivityState activityState = ActivityState.UNKNOWN;
 
-    protected ActivityModule(MqttModule mqttModule,
-                             MqttModule.MqttMessagingTemplate mqttMessagingTemplate) {
-        super("activity", Collections.singletonList(PlatformType.Windows)
-        );
+    protected ActivityModule(MqttModule mqttModule) {
+        super("activity", Collections.singletonList(PlatformType.Windows));
         this.mqttModule = mqttModule;
-        this.mqttMessagingTemplate = mqttMessagingTemplate;
     }
 
-    @Scheduled(cron = "${activity.report-cron:-}")
-    public void sendScheduledReport() {
-        if (System.getProperty("os.name").contains("Windows")) {
-            sendReportToMqtt();
-        }
+    @Bean
+    @ConditionalOnProperty("activity.report-cron")
+    @ConditionalOnPlatform({PlatformType.Windows})
+    public IntegrationFlow activityPollingFlow(
+            @Value("${activity.report-cron:-}") String cronExpression,
+            MessageSource<LocalDateTime> activityStateMessageSource,
+            JsonObjectMapper<?, ?> jsonObjectMapper
+    ) {
+        return IntegrationFlows.from(activityStateMessageSource,
+                c -> c.poller(Pollers.cron(cronExpression).maxMessagesPerPoll(1)))
+                .routeToRecipients(r -> r
+                        .recipientFlow(f -> f
+                                .<LocalDateTime, MqttPayload>transform(la -> new MqttPayload("activity/lastUserInput", la))
+                                .transform(Transformers.toJson(jsonObjectMapper))
+                                .channel(ModuleUtil.getInputChannelName(mqttModule, MqttModule.ACTION_SEND))
+                        )
+                        .recipientFlow(f -> f
+                                .<LocalDateTime, MqttPayload>transform(la -> new MqttPayload("activity/state", getState(la)))
+                                .channel(ModuleUtil.getInputChannelName(mqttModule, MqttModule.ACTION_SEND))
+                        )
+                )
+                .get();
     }
 
-    public void sendReportToMqtt() {
-        int idleSec = getIdleTimeMillisWin32() / 1000;
-        ActivityState newState =
-                idleSec < 30 ? ActivityState.ACTIVE :
-                        idleSec > 5 * 60 ? ActivityState.AWAY : ActivityState.IDLE;
-        if (newState != activityState) {
-            activityState = newState;
-            sendMessage("activity/state", activityState.toString().toLowerCase());
-        }
-        // TODO: send last-will message "away"
+    private ActivityState getState(LocalDateTime lastUserInput) {
+        LocalDateTime now = LocalDateTime.now();
+        if (lastUserInput.plus(30, ChronoUnit.SECONDS).isAfter(now)) return ActivityState.ACTIVE;
+        if (lastUserInput.plus(5, ChronoUnit.MINUTES).isAfter(now)) return ActivityState.IDLE;
+        return ActivityState.AWAY;
     }
 
-    private void sendMessage(String topic, Object value) {
-        var mqttChannel = ModuleUtil.getInputChannelName(mqttModule, ACTION_SEND);
-        mqttMessagingTemplate.send(new MqttPayload(topic, value));
+    @Bean
+    @ConditionalOnPlatform({PlatformType.Windows})
+    public MessageSource<LocalDateTime> activityStateMessageSource() {
+        return new Win32LastActivityMessageSource();
     }
 }
