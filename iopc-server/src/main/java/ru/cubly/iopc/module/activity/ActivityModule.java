@@ -51,7 +51,7 @@ public class ActivityModule extends AbstractModule {
                                 .channel(ModuleUtil.getInputChannelName(mqttModule, MqttModule.ACTION_SEND))
                         )
                         .recipientFlow(f -> f
-                                .<LocalDateTime, MqttPayload>transform(la -> new MqttPayload("activity/state", getState(la)))
+                                .<LocalDateTime, MqttPayload>transform(la -> new MqttPayload("activity/state", getState(la).toString().toLowerCase()))
                                 .channel(ModuleUtil.getInputChannelName(mqttModule, MqttModule.ACTION_SEND))
                         )
                 )

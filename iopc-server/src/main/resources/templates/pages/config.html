@@ -80,27 +80,31 @@
         <div class="ten wide column">
             <div class="ui styled fluid accordion" id="modules-accordion">
                 <th:block th:each="m : ${moduleDescriptions}">
-                    <div class="ui very compact grid title">
+                    <div class="ui very compact grid title"
+                         th:class="'ui very compact grid '+${configuredModuleId == m.moduleId ? 'active ' : ''}+'title'"
+                         th:id="'module-'+${m.moduleId}">
                         <div class="ui column name">
                             <th:block th:text="${m.moduleName}">ModuleName</th:block>
                             <i th:if="${m.configurable}" class="wrench icon"></i>
                         </div>
 
-                        <!--/*
                         <div class="ui column check">
                             <div class="ui toggle checkbox header-checkbox" data-content="Toggle module"
                                  data-inverted="" data-position="top right">
                                 <input type="checkbox" tabindex="0" class="hidden" th:checked="${m.enabled}">
                             </div>
                         </div>
-                        */-->
                     </div>
-                    <div th:if="${!m.configurable}" class="content">
+                    <div th:if="${!m.configurable}"
+                         class="content"
+                         th:class="${configuredModuleId == m.moduleId ? 'active ' : ''}+'content'">
                         <div class="ui visible message">
                             <p th:text="#{config.module.no-config}"></p>
                         </div>
                     </div>
-                    <div th:if="${m.configurable}" class="content">
+                    <div th:if="${m.configurable}"
+                         class="content"
+                         th:class="'content'+${configuredModuleId == m.moduleId ? ' active' : ''}">
                         <form class="ui form"
                               action="#"
                               th:action="@{/config/{id}(id=${m.moduleId})}"

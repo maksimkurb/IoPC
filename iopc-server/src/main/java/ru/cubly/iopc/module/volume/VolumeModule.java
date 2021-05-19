@@ -16,6 +16,7 @@ import ru.cubly.iopc.module.mqtt.MqttPayload;
 import ru.cubly.iopc.util.FlowUtils;
 import ru.cubly.iopc.util.ModuleUtil;
 import ru.cubly.iopc.util.PlatformType;
+import ru.cubly.iopc.util.conditions.ConditionalOnPlatform;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -48,6 +49,7 @@ public class VolumeModule extends AbstractModule implements CallableModule {
     }
 
     @Bean
+    @ConditionalOnPlatform({PlatformType.Windows})
     public IntegrationFlow setVolumeIntegrationFlow() {
         return FlowUtils.forService(this, ACTION_SET)
                 .handle(this::setVolume)
@@ -62,6 +64,7 @@ public class VolumeModule extends AbstractModule implements CallableModule {
     }
 
     @Bean
+    @ConditionalOnPlatform({PlatformType.Windows})
     public IntegrationFlow getVolumeIntegrationFlow() {
         return FlowUtils.forService(this, ACTION_GET)
                 .handle(this::getVolume)
@@ -70,6 +73,6 @@ public class VolumeModule extends AbstractModule implements CallableModule {
     }
 
     private MqttPayload getVolume(IntentPayload payload, MessageHeaders headers) {
-        return new MqttPayload("volume/level", VolumeControl.getMasterVolume());
+        return new MqttPayload("volume/level", VolumeControl.getMasterVolume(), true);
     }
 }

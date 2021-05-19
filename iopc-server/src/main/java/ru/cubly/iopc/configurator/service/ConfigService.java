@@ -108,7 +108,13 @@ public class ConfigService {
         } catch (IOException ignore) {
         }
 
-        props.putAll(properties);
+        properties.entrySet().stream()
+                .filter(e -> e.getValue() == null)
+                .map(Map.Entry::getKey)
+                .forEach(props::remove);
+        props.putAll(properties.entrySet().stream()
+                .filter(e -> e.getValue() != null)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
 
         try (var fos = new FileOutputStream(filePath)) {
             props.store(fos, "Config edited from UI");
