@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" monitorInterval="30">
+    <Properties>
+        <Property name="LOG_PATTERN">
+            %d{ISO8601} %5p ${hostName} --- [%15.15t] %-40.40c{1.} : %m%n%ex
+        </Property>
+    </Properties>
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT" follow="true">
+            <PatternLayout
+                    disableAnsi="false"
+                    pattern="%style{%d{ISO8601}}{black} %highlight{%-5level } --- [%style{%10.10t}{bright,blue}] %style{%-30.30c{1.}}{bright,yellow} : %m%n%ex" />
+        </Console>
+        <RollingFile name="RollingFile"
+                     fileName="./logs/iopc.log"
+                     filePattern="./logs/$${date:yyyy-MM}/iopc-%d{-yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <!-- rollover on startup, daily and when the file reaches
+                    10 MegaBytes -->
+                <OnStartupTriggeringPolicy />
+                <SizeBasedTriggeringPolicy
+                        size="10 MB" />
+                <TimeBasedTriggeringPolicy />
+            </Policies>
+            <DefaultRolloverStrategy>
+                <Delete basePath="./logs/" maxDepth="1">
+                    <IfFileName glob="*/iopc-*.log.gz" />
+                    <IfLastModified age="4d" />
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="Console" />
+            <AppenderRef ref="RollingFile" />
+        </Root>
+        <logger name="org.springframework.integration" level="warn" additivity="false">
+            <AppenderRef ref="Console" />
+            <AppenderRef ref="RollingFile" />
+        </logger>
+    </Loggers>
+</Configuration>

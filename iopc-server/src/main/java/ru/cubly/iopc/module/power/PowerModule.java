@@ -1,6 +1,6 @@
 package ru.cubly.iopc.module.power;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.SystemUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.integration.dsl.IntegrationFlow;
@@ -10,7 +10,6 @@ import ru.cubly.iopc.AbstractModule;
 import ru.cubly.iopc.action.DummyIntentPayload;
 import ru.cubly.iopc.action.IntentPayload;
 import ru.cubly.iopc.module.CallableModule;
-import ru.cubly.iopc.module.presentation.PresentationControlPayload;
 import ru.cubly.iopc.util.FlowUtils;
 import ru.cubly.iopc.util.PlatformType;
 
@@ -19,7 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Service
-@Slf4j
+@Log4j2
 public class PowerModule extends AbstractModule implements CallableModule {
     public static final String ACTION_SHUTDOWN = "shutdown";
     public static final String ACTION_REBOOT = "reboot";
@@ -48,28 +47,28 @@ public class PowerModule extends AbstractModule implements CallableModule {
     @Bean
     public IntegrationFlow powerShutdownIntegrationFlow() {
         return FlowUtils.forService(this, ACTION_SHUTDOWN)
-                .handle(this::shutdown, conf -> conf.requiresReply(false))
+                .handle(this::shutdown)
                 .get();
     }
 
     @Bean
     public IntegrationFlow powerRebootIntegrationFlow() {
         return FlowUtils.forService(this, ACTION_REBOOT)
-                .handle(this::reboot, conf -> conf.requiresReply(false))
+                .handle(this::reboot)
                 .get();
     }
 
     @Bean
     public IntegrationFlow powerSleepIntegrationFlow() {
         return FlowUtils.forService(this, ACTION_SLEEP)
-                .handle(this::sleep, conf -> conf.requiresReply(false))
+                .handle(this::sleep)
                 .get();
     }
 
     @Bean
     public IntegrationFlow powerHibernateIntegrationFlow() {
         return FlowUtils.forService(this, ACTION_HIBERNATE)
-                .handle(this::hibernate, conf -> conf.requiresReply(false))
+                .handle(this::hibernate)
                 .get();
     }
 

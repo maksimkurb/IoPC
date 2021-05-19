@@ -1,4 +1,4 @@
-package ru.cubly.iopc.configurator.model;
+package ru.cubly.iopc.module.webui.model;
 
 import lombok.Builder;
 import lombok.Data;

@@ -1,6 +1,6 @@
 package ru.cubly.iopc.module.keyboard;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.messaging.MessageHeaders;
@@ -18,7 +18,7 @@ import java.util.List;
 
 
 @Service
-@Slf4j
+@Log4j2
 public class KeyboardModule extends AbstractModule implements CallableModule {
     public static final String ACTION_PRESS = "press";
 

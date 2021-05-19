@@ -1,6 +1,6 @@
 package ru.cubly.iopc.module.mqtt;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Bean;
 import org.springframework.integration.annotation.MessagingGateway;
@@ -32,7 +32,7 @@ import static ru.cubly.iopc.module.mqtt.MqttUtil.STATE_TOPIC;
 
 @RefreshScope
 @Service
-@Slf4j
+@Log4j2
 public class MqttModule extends AbstractModule implements CallableModule, ConfigurableModule<MqttProperties> {
     public static final String ACTION_SEND = "send";
     private final List<CallableModule> modules;

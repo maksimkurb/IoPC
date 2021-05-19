@@ -1,36 +1,32 @@
-package ru.cubly.iopc.configurator.controller;
+package ru.cubly.iopc.module.webui.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindException;
 import org.springframework.validation.SmartValidator;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.WebRequestDataBinder;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import ru.cubly.iopc.configurator.model.AppConfig;
-import ru.cubly.iopc.configurator.service.ConfigService;
+import ru.cubly.iopc.module.webui.dto.StatusDto;
+import ru.cubly.iopc.module.webui.model.AppConfig;
+import ru.cubly.iopc.module.webui.service.ConfigService;
+import ru.cubly.iopc.module.webui.service.LogsService;
 
 import javax.validation.Valid;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
 @Controller
-@Slf4j
-public class SettingsController {
+@RequiredArgsConstructor
+@Log4j2
+public class WebUIController {
     private final ConfigService configService;
+    private final LogsService logsService;
     private final SmartValidator validator;
-
-    public SettingsController(ConfigService configService, SmartValidator validator) {
-        this.configService = configService;
-        this.validator = validator;
-    }
 
     @GetMapping("/")
     public String index(Model model) {
@@ -38,6 +34,12 @@ public class SettingsController {
         model.addAttribute("moduleDescriptions", configService.getModuleDescriptions());
         model.addAttribute("reloadRequired", configService.isReloadRequired());
         return "pages/config";
+    }
+
+    @GetMapping("/logs")
+    public String logs(Model model) {
+        model.addAttribute("logs", logsService.getAppLogs());
+        return "pages/logs";
     }
 
     @PostMapping("/config/app")
@@ -53,7 +55,7 @@ public class SettingsController {
         return "redirect:/";
     }
 
-    @SneakyThrows({ BindException.class })
+    @SneakyThrows({BindException.class})
     @PostMapping("/config/{moduleId}")
     public String saveModuleConfig(@PathVariable String moduleId,
                                    RedirectAttributes redirectAttributes,
@@ -81,4 +83,15 @@ public class SettingsController {
         return "redirect:/";
     }
 
+    @PostMapping("/restart")
+    public String restart() {
+        configService.scheduleRestart();
+        return "pages/restart";
+    }
+
+    @RequestMapping(value = "/status", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    public StatusDto status() {
+        return new StatusDto(true);
+    }
 }

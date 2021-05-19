@@ -1,0 +1,48 @@
+<!DOCTYPE HTML>
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layouts/base}"
+        lang="en">
+<head>
+    <title>Restarting...</title>
+</head>
+<body>
+
+<div layout:fragment="content">
+
+    <div class="ui icon info message">
+        <i class="notched circle loading icon"></i>
+        <div class="content">
+            <div class="header" th:text="#{app.restarting.title}">
+                Just one second
+            </div>
+            <p th:text="#{app.restarting.message}">App is restarting...</p>
+        </div>
+    </div>
+</div>
+
+
+<th:block layout:fragment="scripts">
+    <script>
+        function checkAppStatus() {
+            fetch("/status")
+                .then(resp => resp.json())
+                .then(body => {
+                    if (body.running) {
+                        console.log("App is started, redirect back...");
+                        window.location.href = "/";
+                    }
+                })
+        }
+
+        $(document).ready(function () {
+            setTimeout(function () {
+                setInterval(checkAppStatus, 1500);
+            }, 15000);
+        });
+    </script>
+</th:block>
+
+</body>
+</html>

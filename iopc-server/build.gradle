@@ -4,43 +4,103 @@
 
 plugins {
     id "org.springframework.boot" version "2.4.0"
-    id 'java'
+    id "de.inetsoftware.setupbuilder" version "4.8.7"
+    id "java"
+    id "application"
 }
 
 apply plugin: 'io.spring.dependency-management'
 
 group = 'ru.cubly.iopc'
-version = '0.0.1-SNAPSHOT'
+version = '0.9.0'
 
 processResources {
     filesMatching('application.properties') {
         expand(project.properties)
     }
 }
+
 ext {
     set('springCloudVersion', "2020.0.0")
 }
 
+setupBuilder {
+    vendor = 'Maxim Kurbatov'
+    application = "IoPC Agent"
+    appIdentifier = "iopc-agent"
+    licenseFile = '../LICENSE.txt'
+    icons = ['src/main/resources/icon/icon16.png',
+             'src/main/resources/icon/icon32.png',
+             'src/main/resources/icon/icon48.png',
+             'src/main/resources/icon/icon64.png',
+             'src/main/resources/icon/icon128.png'
+    ]
+    failOnEmptyFrom = true
+    from bootJar.outputs
+    mainClass = "org.springframework.boot.loader.JarLauncher"
+    mainJar = "iopc-server-${version}.jar"
+
+    bundleJre = new File( System.getProperty('java.home') )
+    bundleJreTarget = "javaruntime"
+
+    service {
+        displayName = "IoPC Agent"
+        description = "Internet of PC (IoPC) Agent helps you to integrate PC into your smart home system"
+        executable = "iopc-server.exe"
+        workDir = "."
+        startOnBoot = true
+    }
+}
+
+msi {
+    languages = ["en-US", "ru-RU"]
+    installScope = "perMachine"
+
+    launch4j {
+        displayName   = "Internet of PC agent (IoPC)"
+        description   = "IoPC helps you to integrate PC into your smart home system"
+
+        executable = "iopc-server.exe"
+        requestedExecutionLevel = "asInvoker"
+    }
+
+    bannerBmp = 'installer/TopBanner.bmp'
+    dialogBmp = 'installer/DialogBanner.bmp'
+}
+
+//dmg.dependsOn jar
+//deb.dependsOn jar
+//rpm.dependsOn jar
+msi.dependsOn bootJar
+
+configurations {
+    compile.exclude module: 'spring-boot-starter-logging'
+}
 
 dependencies {
     implementation project(':iopc-native')
     implementation 'com.1stleg:jnativehook:2.1.0'
 
     implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-logging'
+    implementation 'org.springframework.boot:spring-boot-starter-log4j2'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.integration:spring-integration-mqtt:5.4.4'
     implementation 'org.springframework.integration:spring-integration-websocket:5.4.4'
     implementation 'org.springframework.cloud:spring-cloud-starter-config'
+
     implementation 'org.jmdns:jmdns:3.5.1'
     implementation 'org.reflections:reflections:0.9.12'
+
+    implementation 'org.thymeleaf:thymeleaf'
+    implementation 'org.thymeleaf:thymeleaf-spring5'
+    compile 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
 
     implementation 'com.github.oshi:oshi-core:5.7.2' // TODO: use for SysInfo module
     implementation 'net.java.dev.jna:jna:5.8.0'
 
-    compile 'org.slf4j:slf4j-api'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
 
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.12.3'

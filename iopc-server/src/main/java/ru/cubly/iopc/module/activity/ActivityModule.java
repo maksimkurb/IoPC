@@ -1,8 +1,5 @@
 package ru.cubly.iopc.module.activity;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -25,7 +22,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 
 @Service
-@Slf4j
 public class ActivityModule extends AbstractModule {
     private final MqttModule mqttModule;
 

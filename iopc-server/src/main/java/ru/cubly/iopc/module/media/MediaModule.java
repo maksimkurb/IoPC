@@ -1,6 +1,6 @@
 package ru.cubly.iopc.module.media;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Service
-@Slf4j
+@Log4j2
 public class MediaModule extends AbstractModule implements CallableModule {
     private static final String ACTION_CONTROL = "control";
 
