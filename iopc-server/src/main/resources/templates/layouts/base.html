@@ -1,0 +1,58 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      lang="en">
+<head>
+    <title layout:title-pattern="$LAYOUT_TITLE - $CONTENT_TITLE">IoPC</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+    <link rel="stylesheet" type="text/css" href="/css/semantic.min.css">
+
+    <!-- You MUST include jQuery before Fomantic -->
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/semantic.min.js"></script>
+    <style>
+        .main.container {
+            padding: 1em 0;
+        }
+
+        #main-menu + * {
+            margin-top: 2em;
+        }
+    </style>
+</head>
+<body>
+
+<div class="ui main container">
+    <div class="ui stackable menu" id="main-menu">
+        <div class="ui item">
+            <img src="/logo.png">
+        </div>
+        <a class="item" href="/">
+            <span th:text="#{app.configurator}"></span>
+        </a>
+        <a class="item" href="/logs">
+            <span th:text="#{app.logs}"></span>
+        </a>
+
+        <form action="/restart" method="post" class="right menu">
+            <div class="item">
+                    <button class="ui orange basic button">
+                        <i class="power off icon"></i>
+                        <span th:text="#{app.restart}">Restart</span>
+                    </button>
+            </div>
+        </form>
+    </div>
+
+    <th:block layout:fragment="content"></th:block>
+</div>
+
+<div class="ui fluid container" style="padding: 0 1em">
+    <div layout:fragment="fullwidth-content"></div>
+</div>
+
+<th:block layout:fragment="scripts" />
+
+</body>
+</html>

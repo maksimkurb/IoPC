@@ -1,6 +1,5 @@
 package ru.cubly.iopc.module.websocket;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.websocket.inbound.WebSocketInboundChannelAdapter;
@@ -17,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-@Slf4j
 public class WebSocketModule extends AbstractModule implements ConfigurableModule<WebSocketProperties> {
     private final List<CallableModule> modules;
     private final WebSocketProperties webSocketProperties;

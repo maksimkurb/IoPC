@@ -2,7 +2,6 @@ package ru.cubly.iopc.module.websocket;
 
 import lombok.Getter;
 import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -25,7 +24,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.UUID;
 
-@Slf4j
+
 public class CryptoUtils {
 
     private static final int KEY_SIZE = 2048;
@@ -80,7 +79,7 @@ public class CryptoUtils {
     }
 
     @SneakyThrows({NoSuchAlgorithmException.class, NoSuchPaddingException.class})
-    public static EncryptedMessage encrypt(KeyHolder keyHolder, byte[] payload) throws InvalidKeyException, BadPaddingException, IllegalBlockSizeException, IOException {
+    public static EncryptedMessage encrypt(KeyHolder keyHolder, byte[] payload) throws InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
         SecretKeySpec sharedKey = new SecretKeySpec(keyHolder.sharedKey, 0, 16, "AES");
 
         Cipher bobCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
@@ -94,7 +93,7 @@ public class CryptoUtils {
     }
 
     @SneakyThrows({NoSuchAlgorithmException.class, NoSuchPaddingException.class})
-    public static byte[] decrypt(KeyHolder keyHolder, EncryptedMessage message) throws InvalidKeyException, BadPaddingException, IllegalBlockSizeException, IOException, InvalidAlgorithmParameterException {
+    public static byte[] decrypt(KeyHolder keyHolder, EncryptedMessage message) throws InvalidKeyException, BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException {
         SecretKeySpec sharedKey = new SecretKeySpec(keyHolder.sharedKey, 0, 16, "AES");
 
         IvParameterSpec ivParameterSpec = new IvParameterSpec(message.iv);

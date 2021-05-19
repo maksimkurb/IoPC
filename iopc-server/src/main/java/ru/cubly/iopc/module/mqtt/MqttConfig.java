@@ -1,6 +1,6 @@
 package ru.cubly.iopc.module.mqtt;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,7 +17,7 @@ import org.springframework.messaging.MessageHandler;
 import java.nio.charset.StandardCharsets;
 
 @Configuration
-@Slf4j
+@Log4j2
 public class MqttConfig {
     public static final int STATE_QOS = 1;
     public static final String STATE_ONLINE = "online";

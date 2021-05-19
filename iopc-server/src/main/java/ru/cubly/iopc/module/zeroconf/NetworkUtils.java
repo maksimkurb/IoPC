@@ -1,6 +1,6 @@
 package ru.cubly.iopc.module.zeroconf;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -13,7 +13,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 
 @Service
-@Slf4j
+@Log4j2
 public class NetworkUtils {
 
     private static final byte[] ROUTABLE_HOST_ADDRESS_IPv4 = {1, 1, 1, 1};

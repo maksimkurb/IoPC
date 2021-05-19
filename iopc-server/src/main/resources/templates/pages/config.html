@@ -1,14 +1,12 @@
 <!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layouts/base}"
+        lang="en">
 <head>
-    <title>Getting Started: Serving Web Content</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>Configuration</title>
 
-    <link rel="stylesheet" type="text/css" href="/css/semantic.min.css">
-
-    <!-- You MUST include jQuery before Fomantic -->
-    <script src="/js/jquery.min.js"></script>
-    <script src="/js/semantic.min.js"></script>
     <style>
         .header-checkbox {
             float: right;
@@ -26,28 +24,12 @@
         #modules-accordion .title .check label {
             padding-left: 3.5rem;
         }
-
-        .main.container {
-            padding: 1em 0;
-        }
-
-        #main-menu {
-            margin-bottom: 2em;
-        }
     </style>
 </head>
 <body>
 
-<div class="ui main container">
-
-    <div class="ui stackable menu" id="main-menu">
-        <a class="item" href="/">
-            <i class="gamepad icon"></i>
-            IoPC
-        </a>
-    </div>
-
-    <div class="ui visible info message" th:if="${reloadRequired}">
+<div layout:fragment="content">
+    <div class="ui visible yellow message" th:if="${reloadRequired}">
         <div class="header" th:text="#{reload-required.header}"></div>
         <p th:text="#{reload-required.body}"></p>
     </div>
@@ -66,12 +48,16 @@
                         <i class="dropdown icon"></i>
                         <div class="default text" th:text="#{config.field.language}"></div>
                         <div class="menu">
-                            <div class="item" data-value="en"><i class="us flag"></i><th:block th:text="#{lang.en}"></th:block></div>
-                            <div class="item" data-value="ru"><i class="ru flag"></i><th:block th:text="#{lang.ru}"></th:block></div>
+                            <div class="item" data-value="en"><i class="us flag"></i>
+                                <th:block th:text="#{lang.en}"></th:block>
+                            </div>
+                            <div class="item" data-value="ru"><i class="ru flag"></i>
+                                <th:block th:text="#{lang.ru}"></th:block>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <button class="ui labeled icon primary button" type="submit">
+                <button class="ui labeled icon orange button" type="submit">
                     <i class="save icon"></i>
                     <th:block th:text="#{config.save}"></th:block>
                 </button>
@@ -88,12 +74,14 @@
                             <i th:if="${m.configurable}" class="wrench icon"></i>
                         </div>
 
+                        <!--/*
                         <div class="ui column check">
                             <div class="ui toggle checkbox header-checkbox" data-content="Toggle module"
                                  data-inverted="" data-position="top right">
                                 <input type="checkbox" tabindex="0" class="hidden" th:checked="${m.enabled}">
                             </div>
                         </div>
+                        */-->
                     </div>
                     <div th:if="${!m.configurable}"
                          class="content"
@@ -111,9 +99,9 @@
                               th:object="${m.moduleConfig}"
                               method="post">
                             <th:block
-                                th:replace="~{${'config-fragments/' + m.configFragment} :: form}"
+                                    th:replace="~{${'config-fragments/' + m.configFragment} :: form}"
                             />
-                            <button class="ui labeled icon primary fluid button" type="submit">
+                            <button class="ui labeled icon orange fluid button" type="submit">
                                 <i class="save icon"></i>
                                 <th:block th:text="#{config.module.save}"></th:block>
                             </button>
@@ -125,53 +113,54 @@
     </div>
 </div>
 
-<script>
-    $('#modules-accordion').accordion({
-        selector: {
-            trigger: '.title > .name'
-        }
-    });
-    $('.ui.checkbox').checkbox();
-    $('.selection.dropdown').dropdown();
-    $('.header-checkbox').popup({
-        delay: {
-            show: 700,
-            hide: 70
-        }
-    })
-    $('.message .close')
-        .on('click', function () {
-            $(this)
-                .closest('.message')
-                .transition('fade')
-            ;
+<th:block layout:fragment="scripts">
+    <script>
+        $('#modules-accordion').accordion({
+            selector: {
+                trigger: '.title > .name'
+            }
         });
-</script>
+        $('.ui.checkbox').checkbox();
+        $('.selection.dropdown').dropdown();
+        $('.header-checkbox').popup({
+            delay: {
+                show: 700,
+                hide: 70
+            }
+        })
+        $('.message .close')
+            .on('click', function () {
+                $(this)
+                    .closest('.message')
+                    .transition('fade')
+                ;
+            });
+    </script>
 
-<script th:if="${configSaved == 'app'}">
-    $('body')
-        .toast({
-            class: 'success',
-            message: '[[#{config.saved}]]'
-        });
-</script>
-<script th:if="${configSaved == 'module'}">
-    $('body')
-        .toast({
-            class: 'success',
-            message: '[[#{config.module.saved}]]'
-        });
-</script>
-<script th:if="${configSaveError}">
-    $('body')
-        .toast({
-            displayTime: 5000,
-            class: 'error',
-            title: 'Could not save settings',
-            message: `Please check logs for information.`
-        });
-</script>
-
+    <script th:if="${configSaved == 'app'}">
+        $('body')
+            .toast({
+                class: 'success',
+                message: '[[#{config.saved}]]'
+            });
+    </script>
+    <script th:if="${configSaved == 'module'}">
+        $('body')
+            .toast({
+                class: 'success',
+                message: '[[#{config.module.saved}]]'
+            });
+    </script>
+    <script th:if="${configSaveError}">
+        $('body')
+            .toast({
+                displayTime: 5000,
+                class: 'error',
+                title: 'Could not save settings',
+                message: `Please check logs for information.`
+            });
+    </script>
+</th:block>
 
 </body>
 </html>

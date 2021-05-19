@@ -1,6 +1,6 @@
 package ru.cubly.iopc.module.command;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.messaging.MessageHeaders;
@@ -14,19 +14,14 @@ import ru.cubly.iopc.util.PlatformType;
 import ru.cubly.iopc.util.StreamUtils;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
-@Slf4j
+@Log4j2
 public class CommandModule extends AbstractModule implements CallableModule, ConfigurableModule<CommandProperties> {
     public static final String ACTION_EXECUTE = "execute";
 

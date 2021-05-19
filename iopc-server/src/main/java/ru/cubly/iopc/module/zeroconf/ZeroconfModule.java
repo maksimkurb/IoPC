@@ -1,6 +1,6 @@
 package ru.cubly.iopc.module.zeroconf;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.system.SystemProperties;
@@ -26,7 +26,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
-@Slf4j
+@Log4j2
 public class ZeroconfModule extends AbstractModule {
     private List<JmDNS> mDNSResponders;
 

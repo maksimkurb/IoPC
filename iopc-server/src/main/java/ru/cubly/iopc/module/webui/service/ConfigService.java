@@ -1,28 +1,25 @@
-package ru.cubly.iopc.configurator.service;
+package ru.cubly.iopc.module.webui.service;
 
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.restart.RestartEndpoint;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import ru.cubly.iopc.configurator.model.AppConfig;
-import ru.cubly.iopc.configurator.model.ModuleDescription;
 import ru.cubly.iopc.module.ConfigurableModule;
 import ru.cubly.iopc.module.Module;
+import ru.cubly.iopc.module.webui.model.AppConfig;
+import ru.cubly.iopc.module.webui.model.ModuleDescription;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@Slf4j
 public class ConfigService {
 
     private final String iopcPropertiesFile;
@@ -33,6 +30,8 @@ public class ConfigService {
     private AppConfig appConfig = null;
     private final Map<String, Object> updatedModuleConfig = new HashMap<>();
 
+    private final RestartEndpoint restartEndpoint;
+
     @Getter
     private boolean reloadRequired = false;
 
@@ -40,9 +39,12 @@ public class ConfigService {
             @Value("${spring.config.import}") String iopcPropertiesFile,
             @Value("${server.port}") Integer port,
             @Value("${server.language}") String language,
-            List<Module> modules) {
+            RestartEndpoint restartEndpoint,
+            List<Module> modules
+    ) {
         this.modules = modules;
         this.iopcPropertiesFile = iopcPropertiesFile;
+        this.restartEndpoint = restartEndpoint;
 
         this.port = port;
         this.language = language;
@@ -164,5 +166,12 @@ public class ConfigService {
         }
 
         return builder.build();
+    }
+
+    @SneakyThrows
+    @Async
+    public void scheduleRestart() {
+        Thread.sleep(2000);
+        restartEndpoint.restart();
     }
 }

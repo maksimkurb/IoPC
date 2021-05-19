@@ -1,7 +1,6 @@
 package ru.cubly.iopc.module.sysinfo;
 
 import com.sun.management.OperatingSystemMXBean;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import ru.cubly.iopc.AbstractModule;
@@ -18,7 +17,6 @@ import java.util.Arrays;
 import static ru.cubly.iopc.module.mqtt.MqttModule.ACTION_SEND;
 
 @Service
-@Slf4j
 public class SysInfoModule extends AbstractModule {
     private final MqttModule mqttModule;
     private final MqttModule.MqttMessagingTemplate mqttMessagingTemplate;

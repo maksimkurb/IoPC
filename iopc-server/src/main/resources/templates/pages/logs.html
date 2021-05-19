@@ -1,0 +1,41 @@
+<!DOCTYPE HTML>
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layouts/base}"
+        lang="en">
+<head>
+    <title>Logs</title>
+    <style>
+        html,
+        body {
+            height: 100%;
+        }
+
+        .ui.fluid.container {
+            height: 90%;
+            height: calc(100% - 55px - 3em);
+        }
+
+        @media(max-width: 767px) {
+            .ui.fluid.container {
+                height: 76%;
+                height: calc(100% - 183px - 3em);
+            }
+        }
+
+        .wrapper {
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<th:block layout:fragment="fullwidth-content">
+        <div class="wrapper ui instructive bottom attached segment" style="overflow: scroll">
+            <pre th:text="${logs}"></pre>
+        </div>
+</th:block>
+
+</body>
+</html>
