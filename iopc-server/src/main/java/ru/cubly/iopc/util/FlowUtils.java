@@ -9,6 +9,7 @@ import org.springframework.integration.endpoint.MessageProducerSupport;
 import org.springframework.integration.handler.LoggingHandler;
 import org.springframework.integration.router.HeaderValueRouter;
 import ru.cubly.iopc.action.Intent;
+import ru.cubly.iopc.action.IntentPayload;
 import ru.cubly.iopc.module.CallableModule;
 import ru.cubly.iopc.transformer.ConditionalTransformer;
 
@@ -26,6 +27,9 @@ public class FlowUtils {
         messageProducer.setErrorChannelName(IntegrationContextUtils.ERROR_CHANNEL_BEAN_NAME);
         HeaderValueRouter router = new HeaderValueRouter(HEADER_SERVICE_NAME);
 
+        router.setResolutionRequired(false);
+        router.setDefaultOutputChannelName("defaultRouterChannel");
+
         for (CallableModule m : modules) {
             if (m.getModuleId().equals(inboundModuleId))
                 continue;
@@ -38,10 +42,15 @@ public class FlowUtils {
 
         return IntegrationFlows.from(messageProducer)
                 .log(LoggingHandler.Level.TRACE)
-                .transform(Transformers.fromJson(Intent.class))
+                .transform(ConditionalTransformer.ifString(Transformers.fromJson(Intent.class)))
                 .enrichHeaders(h -> h.headerExpression(HEADER_SERVICE_NAME, "payload.service"))
-                .transform(Intent::getPayload)
+                .transform(FlowUtils::extractPayload)
                 .route(router)
                 .get();
+    }
+
+    private static Object extractPayload(Intent s) {
+        if (s.getPayload() == null || s.getPayload().equals("null")) return IntentPayload.DUMMY;
+        return s.getPayload();
     }
 }

@@ -14,13 +14,19 @@ import org.springframework.integration.mqtt.support.DefaultPahoMessageConverter;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHandler;
 
+import java.nio.charset.StandardCharsets;
+
 @Configuration
 @Slf4j
 public class MqttConfig {
+    public static final int STATE_QOS = 1;
+    public static final String STATE_ONLINE = "online";
+    public static final String STATE_OFFLINE = "offline";
     private final MqttProperties mqttProperties;
 
-    public MqttConfig(MqttProperties properties) {
-        this.mqttProperties = properties;
+
+    public MqttConfig(MqttProperties mqttProperties) {
+        this.mqttProperties = mqttProperties;
     }
 
     @Bean
@@ -35,6 +41,8 @@ public class MqttConfig {
         options.setServerURIs(new String[]{mqttProperties.getServerUri()});
         options.setUserName(mqttProperties.getUsername());
         options.setPassword(mqttProperties.getPassword().toCharArray());
+        options.setWill(MqttUtil.stateTopic(mqttProperties.getPrefix(), mqttProperties.getClientId()),
+                STATE_OFFLINE.getBytes(StandardCharsets.UTF_8), STATE_QOS, true);
         factory.setConnectionOptions(options);
         return factory;
     }
