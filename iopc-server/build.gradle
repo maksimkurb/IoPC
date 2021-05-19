@@ -61,7 +61,6 @@ msi {
         description   = "IoPC helps you to integrate PC into your smart home system"
 
         executable = "iopc-server.exe"
-        requestedExecutionLevel = "asInvoker"
     }
 
     bannerBmp = 'installer/TopBanner.bmp'
