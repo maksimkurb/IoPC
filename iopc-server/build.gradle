@@ -12,7 +12,7 @@ plugins {
 apply plugin: 'io.spring.dependency-management'
 
 group = 'ru.cubly.iopc'
-version = '0.9.0'
+version = '0.9.1'
 
 processResources {
     filesMatching('application.properties') {
@@ -29,26 +29,36 @@ setupBuilder {
     application = "IoPC Agent"
     appIdentifier = "iopc-agent"
     licenseFile = '../LICENSE.txt'
-    icons = ['src/main/resources/icon/icon16.png',
-             'src/main/resources/icon/icon32.png',
-             'src/main/resources/icon/icon48.png',
-             'src/main/resources/icon/icon64.png',
-             'src/main/resources/icon/icon128.png'
+    icons = [
+            "src/main/resources/static/icon/icon16.png",
+            "src/main/resources/static/icon/icon24.png",
+            "src/main/resources/static/icon/icon32.png",
+            "src/main/resources/static/icon/icon48.png",
+            "src/main/resources/static/icon/icon64.png",
+            "src/main/resources/static/icon/icon128.png",
+            "src/main/resources/static/icon/icon256.png",
+            "src/main/resources/static/icon/icon512.png"
     ]
     failOnEmptyFrom = true
     from bootJar.outputs
     mainClass = "org.springframework.boot.loader.JarLauncher"
     mainJar = "iopc-server-${version}.jar"
 
-    bundleJre = new File( System.getProperty('java.home') )
+    bundleJre = new File(System.getProperty('java.home'))
     bundleJreTarget = "javaruntime"
 
-    service {
+    desktopStarter {
+
         displayName = "IoPC Agent"
         description = "Internet of PC (IoPC) Agent helps you to integrate PC into your smart home system"
-        executable = "iopc-server.exe"
+
+        // an alternative executable. Overrides the mainJar and mainClass
+        // either relative to installation root or absolute
+        executable = "iopc-agent.exe"
+
+        // The working directory of the service, relative to installation root
         workDir = "."
-        startOnBoot = true
+
     }
 }
 
@@ -57,11 +67,16 @@ msi {
     installScope = "perMachine"
 
     launch4j {
-        displayName   = "Internet of PC agent (IoPC)"
-        description   = "IoPC helps you to integrate PC into your smart home system"
+        displayName = "Internet of PC agent (IoPC)"
+        description = "IoPC helps you to integrate PC into your smart home system"
 
-        executable = "iopc-server.exe"
+        executable = "iopc-agent.exe"
+        // requestedExecutionLevel = "asInvoker"
     }
+
+    minOS = 6.1
+
+    // wxsTemplate = 'installer/template.wsx'
 
     bannerBmp = 'installer/TopBanner.bmp'
     dialogBmp = 'installer/DialogBanner.bmp'
@@ -88,6 +103,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.integration:spring-integration-mqtt:5.4.4'
     implementation 'org.springframework.integration:spring-integration-websocket:5.4.4'
+
+    implementation 'org.springframework.cloud:spring-cloud-starter'
     implementation 'org.springframework.cloud:spring-cloud-starter-config'
 
     implementation 'org.jmdns:jmdns:3.5.1'

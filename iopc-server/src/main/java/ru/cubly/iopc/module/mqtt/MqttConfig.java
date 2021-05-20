@@ -2,6 +2,8 @@ package ru.cubly.iopc.module.mqtt;
 
 import lombok.extern.log4j.Log4j2;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.channel.DirectChannel;
@@ -17,6 +19,8 @@ import org.springframework.messaging.MessageHandler;
 import java.nio.charset.StandardCharsets;
 
 @Configuration
+@ConditionalOnProperty("mqtt.server-uri")
+@ConditionalOnExpression("'${mqtt.server-uri}'!=null && '${mqtt.server-uri}'!=''")
 @Log4j2
 public class MqttConfig {
     public static final int STATE_QOS = 1;
