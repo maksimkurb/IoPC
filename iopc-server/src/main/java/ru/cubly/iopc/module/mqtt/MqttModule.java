@@ -1,6 +1,9 @@
 package ru.cubly.iopc.module.mqtt;
 
 import lombok.extern.log4j.Log4j2;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Bean;
 import org.springframework.integration.annotation.MessagingGateway;
@@ -58,6 +61,7 @@ public class MqttModule extends AbstractModule implements CallableModule, Config
     }
 
     @Bean
+    @ConditionalOnBean(MqttConfig.class)
     public IntegrationFlow mqttInbound(MessageProducerSupport mqttMessageDrivenChannelAdapter) {
         return FlowUtils.moduleRouterFlow(
                 mqttMessageDrivenChannelAdapter,
@@ -73,6 +77,7 @@ public class MqttModule extends AbstractModule implements CallableModule, Config
     }
 
     @Bean
+    @ConditionalOnBean(MqttConfig.class)
     public IntegrationFlow mqttOutbound(MessageHandler mqttOutboundMessageHandler) {
         return FlowUtils.forService(this, ACTION_SEND)
                 .enrichHeaders(h -> h.headerExpression(MqttHeaders.TOPIC,
@@ -85,9 +90,12 @@ public class MqttModule extends AbstractModule implements CallableModule, Config
                 .get();
     }
 
-    @Scheduled(fixedRate = 30000, initialDelay = 1000)
-    public void sendScheduledReport() {
-        mqttMessagingTemplate.send(new MqttPayload(STATE_TOPIC, STATE_ONLINE, STATE_QOS, true));
+    @Bean
+    @ConditionalOnMissingBean(MqttConfig.class)
+    public IntegrationFlow mqttOutboundBlackHole() {
+        return FlowUtils.forService(this, ACTION_SEND)
+                .handle((o, h) -> null)
+                .get();
     }
 
     @Override

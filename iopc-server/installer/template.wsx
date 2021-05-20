@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Product>
+
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <!-- Auto-start via Registry -->
+            <Component Id="IoPCAgentAutostart" Guid="ca29d30d-c217-4050-84fa-a4864c5d75eb">
+                <RegistryValue Id="IoPC.rst" Root="HKCU" Action="write"
+                               Key="Software\Microsoft\Windows\CurrentVersion\Run"
+                               Name="IoPC Agent"
+                               Value="[INSTALLDIR]iopc-agent.exe"
+                               Type="string"/>
+            </Component>
+        </Directory>
+
+        <Feature Id="MainApplication">
+            <ComponentRef Id="IoPCAgentAutostart"/>
+        </Feature>
+    </Product>
+</Wix>

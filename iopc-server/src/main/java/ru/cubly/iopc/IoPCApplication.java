@@ -20,12 +20,10 @@ import java.util.concurrent.Executor;
 @SpringBootApplication
 @ConfigurationPropertiesScan("ru.cubly.iopc")
 public class IoPCApplication {
-    static {
-        System.setProperty("java.awt.headless", "false");
-    }
 
     public static void main(String[] args) {
         new SpringApplicationBuilder(IoPCApplication.class)
+                .headless(false)
                 .run(args);
     }
 

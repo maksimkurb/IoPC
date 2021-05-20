@@ -5,13 +5,13 @@
 <th:block th:fragment="form">
     <div class="fields" th:each="entrypoint, stat: *{allowedEntrypoints}">
         <div class="six wide field">
-            <label for="commandId" th:text="#{config.module.command.entrypointId}">Entrypoint ID</label>
-            <input type="text" id="commandId" th:name="'allowedEntrypoints['+${stat.index}+'].id'" th:value="*{allowedEntrypoints[__${stat.index}__].id}"
+            <label th:for="'commandId-'+${stat.index}" th:text="#{config.module.command.entrypointId}">Entrypoint ID</label>
+            <input type="text" th:id="'commandId-'+${stat.index}" th:name="'allowedEntrypoints['+${stat.index}+'].id'" th:value="*{allowedEntrypoints[__${stat.index}__].id}"
                    placeholder="run_minecraft">
         </div>
         <div class="ten wide field">
-            <label for="commandValue" th:text="#{config.module.command.entrypoint}">Entrypoint</label>
-            <input type="text" id="commandValue" th:name="'allowedEntrypoints['+${stat.index}+'].executablePath'" th:value="*{allowedEntrypoints[__${stat.index}__].executablePath}" placeholder="D:\Games\Minecraft\minecraft-launcher.exe">
+            <label th:for="'commandValue-'+${stat.index}" th:text="#{config.module.command.entrypoint}">Entrypoint</label>
+            <input type="text" th:id="'commandValue-'+${stat.index}" th:name="'allowedEntrypoints['+${stat.index}+'].executablePath'" th:value="*{allowedEntrypoints[__${stat.index}__].executablePath}" placeholder="D:\Games\Minecraft\minecraft-launcher.exe">
         </div>
     </div>
     <div class="fields">

@@ -10,7 +10,7 @@ import ru.cubly.iopc.util.Constants;
 @Configuration
 public class FlowConfig {
     @Bean
-    public IntegrationFlow loggingFlow() {
+    public IntegrationFlow routerLoggingFlow() {
         return IntegrationFlows.from("defaultRouterChannel")
                 .log(LoggingHandler.Level.WARN, "ROUTER_LOGGER",
                         m -> "Route not found for message: service="
