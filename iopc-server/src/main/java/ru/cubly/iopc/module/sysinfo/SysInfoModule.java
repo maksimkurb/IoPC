@@ -3,6 +3,9 @@ package ru.cubly.iopc.module.sysinfo;
 import com.sun.management.OperatingSystemMXBean;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import oshi.SystemInfo;
+import oshi.hardware.GlobalMemory;
+import oshi.hardware.HardwareAbstractionLayer;
 import ru.cubly.iopc.AbstractModule;
 import ru.cubly.iopc.module.mqtt.MqttModule;
 import ru.cubly.iopc.module.mqtt.MqttPayload;
@@ -20,6 +23,7 @@ import static ru.cubly.iopc.module.mqtt.MqttModule.ACTION_SEND;
 public class SysInfoModule extends AbstractModule {
     private final MqttModule mqttModule;
     private final MqttModule.MqttMessagingTemplate mqttMessagingTemplate;
+    private final GlobalMemory globalMemory;
 
     protected SysInfoModule(MqttModule mqttModule,
                             MqttModule.MqttMessagingTemplate mqttMessagingTemplate) {
@@ -30,6 +34,10 @@ public class SysInfoModule extends AbstractModule {
         );
         this.mqttModule = mqttModule;
         this.mqttMessagingTemplate = mqttMessagingTemplate;
+
+        SystemInfo systemInfo = new SystemInfo();
+        HardwareAbstractionLayer hal = systemInfo.getHardware();
+        this.globalMemory = hal.getMemory();
     }
 
     @Scheduled(cron = "${sysinfo.report-cron:-}")
@@ -38,11 +46,10 @@ public class SysInfoModule extends AbstractModule {
     }
 
     public void sendReportToMqtt() {
-        var runtime = Runtime.getRuntime();
         OperatingSystemMXBean operatingSystemMXBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
 
-        sendMessage("sysinfo/ram/free", runtime.freeMemory() + (runtime.maxMemory() - runtime.freeMemory()));
-        sendMessage("sysinfo/ram/total", runtime.totalMemory());
+        sendMessage("sysinfo/ram/free", this.globalMemory.getAvailable());
+        sendMessage("sysinfo/ram/total", this.globalMemory.getTotal());
         sendMessage("sysinfo/cpu/usage", Math.round(operatingSystemMXBean.getSystemCpuLoad() * 100));
 
         File[] roots = File.listRoots();
