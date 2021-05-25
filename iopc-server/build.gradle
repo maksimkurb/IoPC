@@ -12,7 +12,7 @@ plugins {
 apply plugin: 'io.spring.dependency-management'
 
 group = 'ru.cubly.iopc'
-version = '0.9.1'
+version = '0.9.2'
 
 processResources {
     filesMatching('application.properties') {
